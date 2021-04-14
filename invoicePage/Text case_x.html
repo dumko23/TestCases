@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <title>This is a Test Case!1</title>
+    <link rel="stylesheet" href="Style.css">
+        </head>
+<body>
+<div class="title">
+    <h3 class="line">Invoices</h3>
+</div>
+
+<div class="actionsBar">
+    <h4>Actions</h4>
+    <button onclick="document.getElementById('addNew').style.display='block'" type="submit">Add new +</button>
+</div>
+
+<div id="addNew" class="modal">
+
+<form class="modal-content animate">
+
+<span onclick="document.getElementById('addNew').style.display='none'"
+      class="close" title="Close">&times;</span>
+
+    <div class="container" id="numberContainer">
+    <label for="number"><b>Number:<br></b></label>
+    <input type="text" placeholder="INV-000000" name="number" id="number" minlength="<3>" required>
+    </div>
+
+    <div class="container" id="invoiceContainer">
+    <label for="invoiceDate"><b>Invoice date:<br></b></label>
+    <input type="date" placeholder="Select Date" name="date_created" id="invoiceDate" style="float: right" required>
+    </div>
+
+    <div class="container" id="supplyContainer">
+    <label for="supplyDate"><b>Supply Date:<br></b></label>
+    <input type="date" value="Supply Date" name="date_supplied" id="supplyDate" required>
+    </div>
+
+    <div class="container" id="commentContainer">
+        <label for="comment"><b>Comment:<br></b></label>
+        <textarea name="comment" id="comment" placeholder="Optional. Max. 160 symbols" maxlength="160">
+        </textarea>
+    </div>
+
+    <div class="container">
+    <button type="button" onclick="sendData(); onSend(); document.getElementById('addNew').style.display='none'" class="createButton">Save</button>
+    </div>
+</form>
+</div>
+
+<div class="invoiceBar">
+    <div><h4>Invoices</h4></div>
+    <div>
+<table>
+    <tr class="titleTableLine">
+        <th>Create</th>
+        <th>№</th>
+        <th>Supply</th>
+        <th>Comment</th>
+    </tr>
+</table>
+    </div>
+</div>
+<script>
+    let table = document.querySelector('table');
+    let tr = document.querySelector('td');
+</script>
+<script>
+        let jsonServer = 'http://localhost:3000/invoice';
+        let xhr = new XMLHttpRequest();
+        xhr.withCredentials = true;
+        xhr.open('GET', jsonServer, true);
+        xhr.setRequestHeader("content-type", "application/json");
+        xhr.responseType = 'text';
+        console.log(xhr.send());
+
+        xhr.onload = async function() {
+            let invoiceText = xhr.response;
+            let invoices = JSON.parse(invoiceText);
+            showTd(invoices);
+        }
+
+        function showTd(obj) {
+
+            for (let i = 0; i < obj.length; i++) {
+
+                let myTr = document.createElement('tr');
+                let myTdNumbers = document.createElement('td');
+                let myTdCreated = document.createElement('td');
+                let myTdSupplied = document.createElement('td');
+                let myTdComment = document.createElement('td');
+
+                myTdNumbers.textContent = obj[i].number;
+                myTdCreated.textContent = obj[i].date_created;
+                myTdSupplied.textContent = obj[i].date_supplied;
+                myTdComment.textContent = obj[i].comment;
+
+                table.appendChild(myTr);
+                myTr.appendChild(myTdNumbers);
+                myTr.appendChild(myTdCreated);
+                myTr.appendChild(myTdSupplied);
+                myTr.appendChild(myTdComment);
+            }
+        }
+</script>
+<script>
+
+    function sendData() {
+        let xhr = new XMLHttpRequest();
+        xhr.open("POST", "http://localhost:3000/invoice");
+        xhr.withCredentials = true;
+        xhr.setRequestHeader("content-type", "application/json");
+
+
+        let number = document.querySelector('#number');
+        let date_created = document.querySelector('#invoiceDate');
+        let date_supplied = document.querySelector('#supplyDate');
+        let comment = document.querySelector('#comment');
+        let data = JSON.stringify({"number": Number(number.value), "date_created": String(date_created.value),
+            "date_supplied": String(date_supplied.value), "comment": comment.value});
+        xhr.send(data);
+    }
+</script>
+<script>
+    function onSend(){
+        let jsonServer = 'http://localhost:3000/invoice';
+        let xhr = new XMLHttpRequest();
+        xhr.withCredentials = true;
+        xhr.open('GET', jsonServer, true);
+        xhr.setRequestHeader("content-type", "application/json");
+        xhr.responseType = 'text';
+        console.log(xhr.send());
+
+
+        xhr.onreadystatechange = function () {
+            if (xhr.readyState === XMLHttpRequest.DONE && xhr.status === 200){
+                let invoiceText = xhr.response;
+                let invoices = JSON.parse(invoiceText);
+                showTd(invoices);
+            }
+        }
+
+        function showTd(obj) {
+            for (let i = 0; i < obj.length; i++) {
+
+                let myTr = document.createElement('tr');
+                let myTdNumbers = document.createElement('td');
+                let myTdCreated = document.createElement('td');
+                let myTdSupplied = document.createElement('td');
+                let myTdComment = document.createElement('td');
+
+                myTdNumbers.textContent = obj[i].number;
+                myTdCreated.textContent = obj[i].date_created;
+                myTdSupplied.textContent = obj[i].date_supplied;
+                myTdComment.textContent = obj[i].comment;
+
+                table.appendChild(myTr);
+                myTr.appendChild(myTdNumbers);
+                myTr.appendChild(myTdCreated);
+                myTr.appendChild(myTdSupplied);
+                myTr.appendChild(myTdComment);
+            }
+        }
+    }
+</script>
+<script>
+    let modal = document.getElementById('addNew');
+
+    window.onclick = function(event) {
+        if (event.target === modal) {
+            modal.style.display = "none";
+        }
+    }
+</script>
+</body>
+</html>
